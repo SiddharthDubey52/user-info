@@ -101,7 +101,7 @@ class UserInfoService {
             if (devicePatterns.vendor !== 'Unknown') vendor = devicePatterns.vendor;
             if (devicePatterns.model !== 'Unknown') model = devicePatterns.model;
 
-            return {
+            const deviceInfo = {
                 type: deviceType,
                 vendor,
                 model,
@@ -121,8 +121,16 @@ class UserInfoService {
                 hardwareConcurrency: frontendData.hardwareConcurrency || this.inferCores(vendor, model),
                 deviceMemory: frontendData.deviceMemory || this.inferMemory(deviceType, vendor),
                 maxTouchPoints: frontendData.maxTouchPoints || (deviceType === 'mobile' ? 10 : 0),
-                touchSupport: frontendData.touchSupport !== undefined ? frontendData.touchSupport : (deviceType !== 'desktop')
+                touchSupport: frontendData.touchSupport !== undefined ? frontendData.touchSupport : (deviceType !== 'desktop'),
+                
+                // Battery information (use precise undefined checks to preserve 0/false values)
+                batteryLevel: frontendData.batteryLevel !== undefined ? frontendData.batteryLevel : null,
+                batteryCharging: frontendData.batteryCharging !== undefined ? frontendData.batteryCharging : null,
+                batteryChargingTime: frontendData.batteryChargingTime !== undefined ? frontendData.batteryChargingTime : null,
+                batteryDischargingTime: frontendData.batteryDischargingTime !== undefined ? frontendData.batteryDischargingTime : null
             };
+            
+            return deviceInfo;
         } catch (error) {
             console.error('Error extracting device info:', error);
             return {
@@ -443,7 +451,9 @@ class UserInfoService {
             browser: `${browser.name} ${browser.version}`,
             os: `${system.os} ${system.osVersion}`,
             device: `${device.vendor} ${device.model} (${device.type})`,
-            isp: geolocation.isp
+            isp: geolocation.isp,
+            batteryLevel: device.batteryLevel,
+            batteryCharging: device.batteryCharging
         };
     }
 }

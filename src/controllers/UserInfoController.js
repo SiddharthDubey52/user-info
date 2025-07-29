@@ -5,8 +5,11 @@ class UserInfoController {
     // Main endpoint to get user information
     static async getUserInfo(req, res) {
         try {
+            // Get frontend data from request body (for POST requests)
+            const frontendData = req.body || {};
+            
             // Collect all user information
-            const userData = await UserInfoService.collectUserInfo(req);
+            const userData = await UserInfoService.collectUserInfo(req, frontendData);
             
             // Validate and create UserInfo model
             const validatedData = UserInfo.validateData(userData);

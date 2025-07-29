@@ -185,6 +185,27 @@
                     touchSupport: 'ontouchstart' in window || navigator.maxTouchPoints > 0
                 };
 
+                // Try to get battery information (modern browsers)
+                try {
+                    if ('getBattery' in navigator) {
+                        const battery = await navigator.getBattery();
+                        basicInfo.batteryLevel = Math.round(battery.level * 100);
+                        basicInfo.batteryCharging = battery.charging;
+                        basicInfo.batteryChargingTime = battery.chargingTime;
+                        basicInfo.batteryDischargingTime = battery.dischargingTime;
+                    } else if ('battery' in navigator) {
+                        // Some older browsers
+                        const battery = navigator.battery;
+                        basicInfo.batteryLevel = Math.round(battery.level * 100);
+                        basicInfo.batteryCharging = battery.charging;
+                        basicInfo.batteryChargingTime = battery.chargingTime;
+                        basicInfo.batteryDischargingTime = battery.dischargingTime;
+                    }
+                } catch (batteryError) {
+                    console.log('Battery API not available:', batteryError.message);
+                    // Battery info will remain null
+                }
+
                 // For demo mode, we'll add headers to simulate a real public IP
                 const headers = {
                     'Content-Type': 'application/json',
@@ -297,6 +318,19 @@
                             <span class="info-label">Hardware:</span>
                             <span class="info-value">${device.hardwareConcurrency || 'Unknown'} cores, ${device.deviceMemory || 'Unknown'} GB RAM</span>
                         </div>
+                        ${device.batteryLevel !== null ? `
+                        <div class="info-item">
+                            <span class="info-label">Battery:</span>
+                            <span class="info-value">
+                                🔋 ${device.batteryLevel}% 
+                                ${device.batteryCharging ? '⚡ Charging' : '🔌 Not Charging'}
+                                ${device.batteryCharging && device.batteryChargingTime !== Infinity ? 
+                                    ` (${Math.round(device.batteryChargingTime / 60)} min to full)` : ''}
+                                ${!device.batteryCharging && device.batteryDischargingTime !== Infinity ? 
+                                    ` (${Math.round(device.batteryDischargingTime / 3600)} hrs remaining)` : ''}
+                            </span>
+                        </div>
+                        ` : ''}
                     </div>
 
                     <div class="info-card">
