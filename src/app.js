@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const path = require('path');
 require('dotenv').config();
 
 const database = require('./config/database');
@@ -21,7 +22,7 @@ app.use(helmet());
 app.use(cors({
     origin: process.env.FRONTEND_URL || '*', // Configure this for production
     methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Demo-Mode']
 }));
 
 // Logging middleware
@@ -29,6 +30,9 @@ app.use(morgan('combined'));
 
 // Parse JSON bodies
 app.use(express.json());
+
+// Serve static files from root directory (relative to project root)
+app.use(express.static(require('path').join(__dirname, '..')));
 
 // Trust proxy for accurate IP detection
 app.set('trust proxy', true);

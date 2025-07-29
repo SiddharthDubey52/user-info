@@ -9,6 +9,7 @@ const server = app.listen(PORT, () => {
     console.log(`🔍 User info endpoint: http://localhost:${PORT}/api/user-info`);
     console.log(`📊 Records endpoint: http://localhost:${PORT}/api/user-info/records`);
     console.log(`📈 Statistics endpoint: http://localhost:${PORT}/api/user-info/statistics`);
+    console.log(`🧪 Smart test page: http://localhost:${PORT}/smart-test.html`);
 });
 
 // Graceful shutdown
